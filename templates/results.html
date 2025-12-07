@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Testing Numbers</title>
+</head>
+<body>
+  <h2>Testing Numbers...</h2>
+
+  <table id="results" border="1" cellpadding="6">
+    <tr>
+      <th>Number</th>
+      <th>Status</th>
+    </tr>
+
+    {% for num, status in results.items() %}
+    <tr>
+      <td>{{ num }}</td>
+      <td class="{{ status|lower }}">{{ status }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <script>
+    const jobId = "{{ job_id }}";
+
+    async function poll() {
+      let r = await fetch(`/api/results/${jobId}`);
+      let data = await r.json();
+
+      const rows = document.querySelectorAll("#results tr");
+      let i = 1, done = true;
+
+      for (const num in data) {
+        const row = rows[i];
+        row.cells[1].textContent = data[num];
+
+        if (data[num] !== "Active" && data[num] !== "Inactive") done = false;
+        i++;
+      }
+
+      if (!done) setTimeout(poll, 5000);
+    }
+
+    poll();
+  </script>
+</body>
+</html>
