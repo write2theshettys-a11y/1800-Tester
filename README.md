@@ -1,6 +1,6 @@
 # 1800-Tester
 
-This project is a small web application that allows users to upload a CSV file of phone numbers and test their status using Twilio's Lookup API. The results are displayed in the web interface.
+This project is a web application that allows users to upload a CSV file of 1-800 phone numbers and test their status using Twilio's Lookup API. The results are displayed in the web interface. 
 
 ## Features
 
