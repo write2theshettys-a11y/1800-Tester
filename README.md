@@ -1,6 +1,6 @@
-# Twilio Number Tester
+# 1800-Tester
 
-This project is a web application that allows users to upload a CSV file of phone numbers and test their status using Twilio's Lookup API. The results are displayed in real-time on the web interface.
+This project is a small web application that allows users to upload a CSV file of phone numbers and test their status using Twilio's Lookup API. The results are displayed in the web interface.
 
 ## Features
 
@@ -20,7 +20,7 @@ This project is a web application that allows users to upload a CSV file of phon
 1. Clone the repository:
    ```sh
    git clone <repository-url>
-   cd number_tester_twilio
+   cd 1800-Tester
    ```
 
 2. Install dependencies:
@@ -29,17 +29,17 @@ This project is a web application that allows users to upload a CSV file of phon
    ```
 
 3. Set up environment variables:
-   Create a `.env` file in the project root or export the variables:
+   Copy the example file and fill in your Twilio credentials:
    ```sh
-   export TWILIO_ACCOUNT_SID=your_account_sid
-   export TWILIO_AUTH_TOKEN=your_auth_token
+   cp .env.example .env
+   # then edit .env and add your real values
    ```
 
 ## Usage
 
-1. Run the application:
+1. Run the application locally:
    ```sh
-   uvicorn main:app --reload
+   uvicorn main:app --reload --host 0.0.0.0 --port 8000
    ```
 
 2. Open your browser and navigate to:
@@ -65,12 +65,12 @@ number
 
 1. Build the Docker image:
    ```sh
-   docker build -t number-tester .
+   docker build -t 1800-tester .
    ```
 
 2. Run the Docker container:
    ```sh
-   docker run -p 8000:8000 --env-file .env number-tester
+   docker run -p 8000:8000 --env-file .env 1800-tester
    ```
 
 3. Access the application at:
