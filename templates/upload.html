@@ -41,11 +41,18 @@
   </style>
 </head>
 <body>
-  <h2>Upload CSV of Numbers</h2>
+  <h2>Upload 1800 numbers as CSV file</h2>
+  <h3>CSV format: one number per line, no header</h3>
+  <h4>Example:</h4>
+  <pre>
+18001234567
+18007654321
+18009876543
+  </pre>
   <form action="/upload" method="post" enctype="multipart/form-data">
     <input type="file" name="file" accept=".csv" required>
     <button type="submit">Start Test</button>
   </form>
-  <a href="/download_sample">Download sample CSV</a>
+  <!-- <a href="/download_sample">Download sample CSV</a> -->
 </body>
 </html>

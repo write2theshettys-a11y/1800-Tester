@@ -5,9 +5,9 @@ This project is a small web application that allows users to upload a CSV file o
 ## Features
 
 - Upload a CSV file containing phone numbers.
-- Check the status of phone numbers (e.g., Active, Inactive, or Twilio Disabled).
+- Check the status of phone numbers (e.g., Active, Inactive, or Disabled).
 - Real-time updates of results using polling.
-- Download a sample CSV file for testing.
+- Download the results as a CSV file with timestamp of test completion.
 
 ## Prerequisites
 
@@ -25,7 +25,9 @@ This project is a small web application that allows users to upload a CSV file o
 
 2. Install dependencies:
    ```sh
-   pip install -r requirements.txt
+   python3 -m venv .venv
+   source .venv/bin/activate
+   pip3 install -r requirements.txt
    ```
 
 3. Set up environment variables:
@@ -61,7 +63,7 @@ number
 +18005559876
 ```
 
-## Docker Deployment
+## Docker Deployment (optional)
 
 1. Build the Docker image:
    ```sh

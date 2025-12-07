@@ -1,12 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Testing Numbers</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Testing 1-800 Numbers</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background:#fafafa; color:#222; margin:28px; }
+    h2 { font-weight:600; color:#222; margin-bottom:12px; }
+    .table-container { overflow-x:auto; max-width:100%; }
+    #results { width:100%; max-width:980px; border-collapse:separate; border-spacing:0; border-radius:8px; overflow:hidden; box-shadow:0 6px 18px rgba(15,23,42,0.06); background:#ffffff; }
+    #results th, #results td { padding:12px 14px; text-align:left; vertical-align:middle; }
+    #results th { background:linear-gradient(180deg,#f7f7f8,#efefef); position:sticky; top:0; z-index:2; font-weight:700; font-size:0.95rem; border-bottom:1px solid #e6e6e6; }
+    #results tr:nth-child(even) td { background:#fbfbfb; }
+    #results tr:hover td { background:#f4fbff; }
+    /* Badge styles */
+    .badge { display:inline-block; padding:6px 10px; border-radius:999px; font-weight:700; font-size:0.9rem; min-width:90px; text-align:center; }
+    .badge.active { background:linear-gradient(180deg,#e6ffed,#d8f8df); color:#05582f; box-shadow:inset 0 0 0 3px rgba(8,166,75,0.07); }
+    .badge.inactive { background:linear-gradient(180deg,#ffecec,#ffd6d6); color:#8b1e1e; box-shadow:inset 0 0 0 3px rgba(224,33,33,0.06); }
+    .badge.in-progress, .badge.pending, .badge.queued { background:linear-gradient(180deg,#fff7e6,#fff0d1); color:#8a4b00; box-shadow:inset 0 0 0 3px rgba(255,159,26,0.06); }
+
+    /* Button */
+    .btn { display:inline-block; background:#0f172a; color:#fff; padding:8px 12px; border-radius:8px; text-decoration:none; font-weight:600; font-size:0.95rem; }
+    /* Small screens */
+    @media (max-width:640px) { #results th, #results td { padding:10px 8px; font-size:0.95rem; } }
+  </style>
 </head>
 <body>
-  <h2>Testing Numbers...</h2>
+  <h2>Testing 1-800 Numbers...</h2>
 
-  <table id="results" border="1" cellpadding="6">
+  <div class="table-container">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
+    <a class="btn" id="download-csv" href="/download_results_csv/{{ job_id }}">Download Results CSV</a>
+    <div style="color:#6b7280;font-size:0.95rem;">Job ID: <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:0.9rem;">{{ job_id }}</code></div>
+    <div id="completed-at" style="color:#0f172a;font-weight:600;margin-left:8px;">Test completed at: <span style="font-weight:500;color:#374151">—</span></div>
+  </div>
+
+  <table id="results" border="0" cellpadding="6">
     <tr>
       <th>Number</th>
       <th>Status</th>
@@ -15,27 +44,56 @@
     {% for num, status in results.items() %}
     <tr>
       <td>{{ num }}</td>
-      <td class="{{ status|lower }}">{{ status }}</td>
+      <td><span class="badge {{ status|lower|replace(' ', '-') }}">{{ status }}</span></td>
     </tr>
     {% endfor %}
   </table>
+  </div>
 
   <script>
     const jobId = "{{ job_id }}";
+    function normalizeClass(s) {
+      return String(s || '')
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9\-_.]/g, '');
+    }
 
     async function poll() {
       let r = await fetch(`/api/results/${jobId}`);
       let data = await r.json();
 
+      // API returns { results: {number: status, ...}, completed_at: "..." }
+      const results = data.results || data;
+      const completedAt = data.completed_at || null;
+
       const rows = document.querySelectorAll("#results tr");
       let i = 1, done = true;
 
-      for (const num in data) {
+      for (const num in results) {
         const row = rows[i];
-        row.cells[1].textContent = data[num];
+        if (!row) break;
+        const statusText = results[num];
+        // update badge text and class inside the status cell
+        const badge = row.cells[1].querySelector('.badge');
+        if (badge) {
+          badge.textContent = statusText;
+          badge.className = 'badge ' + normalizeClass(statusText);
+        } else {
+          row.cells[1].textContent = statusText;
+          row.cells[1].className = normalizeClass(statusText);
+        }
 
-        if (data[num] !== "Active" && data[num] !== "Inactive") done = false;
+        if (statusText !== "Active" && statusText !== "Inactive") done = false;
         i++;
+      }
+
+      // update completion time display when available
+      const compEl = document.getElementById('completed-at');
+      if (completedAt) {
+        const span = compEl.querySelector('span');
+        if (span) span.textContent = new Date(completedAt).toLocaleString();
+        done = true; // job is complete
       }
 
       if (!done) setTimeout(poll, 5000);
